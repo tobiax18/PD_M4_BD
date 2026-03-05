@@ -1,209 +1,219 @@
-📦 MegaStore Global – Hybrid Data Architecture Exam
-📌 Project Overview
+# 📦 MegaStore Global – Hybrid Data Architecture
 
-This project is a migration and modernization solution for MegaStore Global, a retail company that previously managed all its operations in a single Excel file.
+## 📌 Project Overview
 
-The objective is to:
+This project is a migration and modernization solution for **MegaStore Global**, a retail company that previously managed all its operations in a single Excel file.
 
-Normalize and structure legacy flat data
+The objective of this project is to:
 
-Design a hybrid persistence architecture
+- Normalize and structure legacy flat data
+- Design a hybrid persistence architecture
+- Implement both SQL and NoSQL databases
+- Develop a RESTful API using Node.js and Express
+- Provide Business Intelligence queries
+- Implement audit logging using MongoDB
 
-Implement both SQL and NoSQL databases
+---
 
-Develop a RESTful API using Node.js
+# 🏗 Architecture Overview
 
-Provide Business Intelligence queries
+The system uses a **Hybrid Database Architecture**:
 
-Implement audit logging
+| Database | Purpose |
+|----------|----------|
+| PostgreSQL | Structured transactional data |
+| MongoDB | Audit logging (deleted products) |
 
-🏗 Architecture Overview
+### Why Hybrid Architecture?
 
-The system uses a Hybrid Database Architecture:
+### PostgreSQL is used because:
+- ACID compliance
+- Referential integrity with Foreign Keys
+- 3NF normalization
+- Complex JOIN queries for analytics
+- Structured transactional operations
 
-Database	Purpose
-PostgreSQL	Structured transactional data
-MongoDB	Audit logging (deleted products)
-Why Hybrid?
+### MongoDB is used because:
+- Flexible document storage
+- High write performance
+- Ideal for audit logs
+- No need for relational constraints
 
-PostgreSQL ensures:
+---
 
-ACID compliance
-
-Referential integrity
-
-3NF normalization
-
-Complex JOIN queries
-
-MongoDB is used for:
-
-Flexible log storage
-
-High write performance
-
-Non-relational audit records
-
-🐘 Relational Database Design (PostgreSQL)
+# 🐘 Relational Database Design (PostgreSQL)
 
 Database Name:
 
+```
 db_megastore_exam
-Tables
-1. customers
+```
 
-id (PK)
+## Tables Structure
 
-name
+### 1. customers
+- id (PK)
+- name
+- email (UNIQUE)
+- address
 
-email (UNIQUE)
+### 2. suppliers
+- id (PK)
+- name (UNIQUE)
+- contact
 
-address
+### 3. categories
+- id (PK)
+- name (UNIQUE)
 
-2. suppliers
+### 4. products
+- id (PK)
+- sku (UNIQUE)
+- name
+- unit_price
+- category_id (FK)
+- supplier_id (FK)
 
-id (PK)
+### 5. orders
+- id (PK)
+- transaction_id (UNIQUE)
+- order_date
+- customer_id (FK)
 
-name (UNIQUE)
+### 6. order_details
+- id (PK)
+- order_id (FK)
+- product_id (FK)
+- quantity
 
-contact
+---
 
-3. categories
+## ✅ Normalization Process (3NF)
 
-id (PK)
+### First Normal Form (1NF)
+- Removed repeating groups.
+- Ensured atomic values.
 
-name (UNIQUE)
+### Second Normal Form (2NF)
+- Eliminated partial dependencies.
+- Separated orders from products.
 
-4. products
+### Third Normal Form (3NF)
+- Eliminated transitive dependencies.
+- Separated suppliers, categories, and customers into independent tables.
 
-id (PK)
+This guarantees:
+- No data redundancy
+- Data integrity
+- Scalability
+- Clean relational structure
 
-sku (UNIQUE)
+---
 
-name
-
-unit_price
-
-category_id (FK)
-
-supplier_id (FK)
-
-5. orders
-
-id (PK)
-
-transaction_id (UNIQUE)
-
-order_date
-
-customer_id (FK)
-
-6. order_details
-
-id (PK)
-
-order_id (FK)
-
-product_id (FK)
-
-quantity
-
-✅ Normalization Process (3NF)
-1NF
-
-Removed repeating groups.
-
-Ensured atomic values.
-
-2NF
-
-Removed partial dependencies.
-
-Separated products from orders.
-
-3NF
-
-Removed transitive dependencies.
-
-Suppliers and categories separated from products.
-
-Customers separated from orders.
-
-This eliminates redundancy and guarantees data consistency.
-
-🍃 NoSQL Database Design (MongoDB)
+# 🍃 NoSQL Database Design (MongoDB)
 
 Database Name:
 
+```
 db_megastore_exam
+```
 
 Collection:
 
+```
 deleted_products_log
-Schema Validation
+```
 
-Fields:
+## Document Structure
 
-productId (Number)
+```json
+{
+  "productId": 10,
+  "deletedAt": "2026-03-05T10:00:00Z"
+}
+```
 
-deletedAt (Date)
+## Schema Validation
 
-Why Not Store Orders in Mongo?
+- productId → Number (required)
+- deletedAt → Date (required)
 
-Orders require JOIN operations.
+### Why not store transactional data in MongoDB?
 
-Strong relational integrity required.
+- Orders require JOIN operations.
+- Strong referential integrity required.
+- SQL is better suited for transactional systems.
 
-SQL is more appropriate for transactional systems.
+MongoDB is exclusively used for audit logging to maintain a clean hybrid architecture.
 
-MongoDB is used exclusively for audit logging, ensuring:
+---
 
-Flexible structure
+# ⚙️ Installation & Setup Guide
 
-Independent scaling
+## 1️⃣ Install PostgreSQL
 
-High-performance insert operations
-
-⚙️ Installation & Setup Guide
-1️⃣ Install PostgreSQL
-
-Download from:
+Download:
 https://www.postgresql.org/download/
 
 Create database:
 
+```sql
 CREATE DATABASE db_megastore_exam;
+```
 
 Connect:
 
+```sql
 \c db_megastore_exam
+```
 
-Run the SQL DDL scripts inside /docs.
+Run the DDL scripts located in `/docs`.
 
-2️⃣ Install MongoDB
+---
+
+## 2️⃣ Install MongoDB
 
 Download:
 https://www.mongodb.com/try/download/community
 
 Start Mongo shell:
 
+```
 mongosh
+```
 
 Create database:
 
+```
 use db_megastore_exam
+```
 
-Run validation script inside /docs.
+Run schema validation script from `/docs`.
 
-3️⃣ Clone the Repository
-git clone <your-repo-url>
+---
+
+## 3️⃣ Clone Repository
+
+```
+git clone <your-repository-url>
 cd megastore-api
-4️⃣ Install Dependencies
+```
+
+---
+
+## 4️⃣ Install Dependencies
+
+```
 npm install
-5️⃣ Configure Environment Variables
+```
 
-Create a .env file:
+---
 
+## 5️⃣ Configure Environment Variables
+
+Create a `.env` file in root directory:
+
+```
 PORT=3000
 
 PG_USER=postgres
@@ -213,122 +223,148 @@ PG_PASSWORD=yourpassword
 PG_PORT=5432
 
 MONGO_URI=mongodb://localhost:27017/db_megastore_exam
-6️⃣ Start Server
+```
+
+---
+
+## 6️⃣ Start Server
+
+```
 node server.js
+```
 
-Server runs on:
+Server will run at:
 
+```
 http://localhost:3000
-📥 Bulk Migration Guide
+```
+
+---
+
+# 📥 Bulk Data Migration
 
 The system includes a migration script that reads a raw CSV file and distributes the data into normalized tables.
 
 Run migration:
 
+```
 node migration/migrate.js
-Idempotency Logic
+```
 
-Before inserting master entities:
+## Idempotency Logic
 
-Check if customer email already exists
+Before inserting master entities, the system checks:
 
-Check if supplier already exists
+- If customer email already exists
+- If supplier already exists
+- If category already exists
+- If product SKU already exists
+- If transaction_id already exists
 
-Check if category already exists
+If record exists → reuse ID  
+If not → insert new record  
 
-Check if product SKU already exists
+This prevents:
+- Duplicate customers
+- Duplicate suppliers
+- Duplicate products
+- Duplicate transactions
 
-Check if transaction_id already exists
+---
 
-If entity exists → reuse its ID
-If not → create new record
-
-This guarantees:
-
-No duplicated customers
-
-No duplicated suppliers
-
-No duplicated products
-
-No duplicated orders
-
-🔁 REST API Endpoints
+# 🔁 REST API Endpoints
 
 Base URL:
 
+```
 http://localhost:3000
-📦 Products CRUD
-Create Product
+```
+
+---
+
+## 📦 Products CRUD
+
+### Create Product
+```
 POST /products
-Get All Products
+```
+
+### Get All Products
+```
 GET /products
-Get Product by ID
+```
+
+### Get Product by ID
+```
 GET /products/:id
-Update Product
+```
+
+### Update Product
+```
 PUT /products/:id
-Delete Product
+```
+
+### Delete Product
+```
 DELETE /products/:id
+```
 
 When deleting:
+- Product is removed from PostgreSQL
+- A deletion log is stored in MongoDB
 
-Product is removed from PostgreSQL
+---
 
-A log entry is created in MongoDB
+# 📊 Business Intelligence Queries
 
-📊 Business Intelligence Queries
+---
 
-These queries can be tested in Postman.
+## 1️⃣ Supplier Analysis
 
-1️⃣ Supplier Analysis
-
-“Which suppliers sold the most items and what is their inventory value?”
-
-Uses:
-
-JOIN
-
-GROUP BY
-
-SUM
-
-ORDER BY
-
-2️⃣ Customer Purchase History
-
-“Show full purchase history of a specific customer.”
-
-Includes:
-
-Products
-
-Dates
-
-Total spent per transaction
-
-3️⃣ Top Selling Products by Category
-
-“List best-selling products inside a specific category ordered by revenue.”
+Which suppliers sold the most items and what is their total inventory value?
 
 Uses:
+- JOIN
+- GROUP BY
+- SUM
+- ORDER BY
 
-Aggregations
+---
 
-Revenue calculation
+## 2️⃣ Customer Purchase History
 
-🧪 Testing with Postman
+Displays:
+- Products purchased
+- Purchase dates
+- Total spent per transaction
 
-Import the provided Postman collection inside /docs.
+---
+
+## 3️⃣ Top Selling Products by Category
+
+Displays:
+- Products inside a category
+- Total quantity sold
+- Total revenue generated
+- Ordered by revenue
+
+---
+
+# 🧪 Testing with Postman
+
+Import the Postman collection located in `/docs`.
 
 Test:
 
-CRUD endpoints
+- CRUD endpoints
+- Business intelligence endpoints
+- Deletion logging
 
-Business Intelligence endpoints
+---
 
-Deletion logging
+# 📁 Project Structure
 
-📁 Project Structure
+```
 megastore-api
 │
 ├── config
@@ -348,42 +384,41 @@ megastore-api
 ├── server.js
 ├── .env
 └── README.md
-🚀 Performance Improvements (Bonus)
+```
 
-Index on foreign keys
+---
 
-Unique constraints
+# 🚀 Performance Improvements
 
-Schema validation in MongoDB
+- Indexes on foreign keys
+- Unique constraints
+- Schema validation in MongoDB
+- Environment variables for security
+- Modular backend architecture
 
-Modular architecture
+---
 
-Environment variables for security
+# 🎯 Acceptance Criteria Coverage
 
-🎯 Acceptance Criteria Coverage
+✔ 3NF applied  
+✔ Referential integrity enforced  
+✔ MongoDB schema validation  
+✔ Idempotent migration  
+✔ RESTful API  
+✔ Audit logging  
+✔ Business intelligence queries  
 
-✔ 3NF applied
-✔ Referential integrity enforced
-✔ Mongo schema validation
-✔ Idempotent migration
-✔ RESTful API
-✔ Audit logging
-✔ Business intelligence queries
+---
 
-🏁 Conclusion
+# 🏁 Conclusion
 
 This project demonstrates:
 
-Proper relational modeling
+- Proper relational modeling
+- Hybrid database architecture
+- Backend modular design
+- Safe migration strategy
+- Audit log implementation
+- Analytical query capabilities
 
-Hybrid database architecture design
-
-Clean backend structure
-
-Data migration strategy
-
-Audit log implementation
-
-Business intelligence capability
-
-The system is scalable, maintainable, and aligned with enterprise backend best practices.
+The solution is scalable, maintainable, and aligned with enterprise backend best practices.
